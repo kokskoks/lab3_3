@@ -10,6 +10,7 @@ public class Order {
 	private static final int VALID_PERIOD_HOURS = 24;
 	private State orderState;
 	private List<OrderItem> items = new ArrayList<OrderItem>();
+	private TimeSource timeSource = new RealTimeSource();
 	private DateTime subbmitionDate;
 
 	public Order() {
@@ -28,13 +29,13 @@ public class Order {
 		requireState(State.CREATED);
 
 		orderState = State.SUBMITTED;
-		subbmitionDate = new DateTime();
+		subbmitionDate = new DateTime(timeSource.currentTimeMillis());
 
 	}
 
 	public void confirm() {
 		requireState(State.SUBMITTED);
-		int hoursElapsedAfterSubmittion = Hours.hoursBetween(subbmitionDate, new DateTime()).getHours();
+		int hoursElapsedAfterSubmittion = Hours.hoursBetween(subbmitionDate, new DateTime(timeSource.currentTimeMillis())).getHours();
 		if(hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS){
 			orderState = State.CANCELLED;
 			throw new OrderExpiredException();
@@ -65,4 +66,14 @@ public class Order {
 	public static enum State {
 		CREATED, SUBMITTED, CONFIRMED, REALIZED, CANCELLED
 	}
+
+	public TimeSource getTimeSource() {
+		return timeSource;
+	}
+
+	public void setTimeSource(TimeSource timeSource) {
+		this.timeSource = timeSource;
+	}
+	
+	
 }
