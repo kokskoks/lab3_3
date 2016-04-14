@@ -6,9 +6,12 @@ import org.junit.Test;
 
 public class OrderTest {
 
-	@Test
-	public void test() {
-		fail("Not yet implemented");
+	@Test(expected = OrderExpiredException.class)
+	public void testOrderOverdue() {
+		Order order = new Order();
+		order.submit();
+		order.setTimeSource(new TestTimeSource());
+		order.confirm();
 	}
 
 }
